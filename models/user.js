@@ -32,13 +32,24 @@ class User extends Sequelize.Model {
             underscored: false, //created_at, updated_at
             modelName: 'User', //javascript ModelName
             tableName: 'users',//DB ModelName
-            paranoid: true, //deleteAt 유저 삭제일
-            collate: 'utf8_general_ci',
+            paranoid: true, //deleteAt 유저 삭제일, soft delete
+            charset: 'utf8mb4', 
+            collate: 'utf8mb4_general_ci', // 저장데이터 정렬방식
         })
     }
 
     static associate(db){
-
+        db.User.hasMany(db.Post); //1:n
+        db.User.belongsToMany(db.User, { //팔로워, n:n 
+            foreignKey: 'followingId',
+            as: 'Followers',
+            through: 'Follow' //중간 테이블
+        })
+        db.User.belongsToMany(db.User, { //팔로잉 n:n
+            foreignKey: 'followerId',
+            as: 'Followings',
+            through: 'Follow'
+        })
     }
 };
 

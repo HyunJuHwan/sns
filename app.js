@@ -5,6 +5,7 @@ const path = require('path'); //node 내장 모듈
 const session = require('express-session'); //session
 const nunjucks = require('nunjucks'); //front frameworks
 const dotenv = require('dotenv'); //설정파일
+const { sequelize } = require('./models');
 
 dotenv.config(); //process.env에 값이 들어간다.
 const pageRouter = require('./routes/page');
@@ -18,6 +19,14 @@ nunjucks.configure('views', {
     express: app,
     watch: true,
 });
+
+sequelize.sync( {force: false} ) //force = 서버 재시작 시 테이블 전체 삭제 후 다시 생성, sync 시 DB연결
+    .then(() => {
+        console.log('db connection ok');
+    })
+    .catch((err) => {
+        console.error(err);
+    })
 
 app.use(morgan('dev')); // logging dev = dev -> combined = prod
 app.use(express.static(path.join(__dirname, 'public'))); //public dir static으로 변경, __dirname = SNS 경로와 public 경로를 join하고 static으로 변경
