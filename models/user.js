@@ -1,6 +1,4 @@
 const Sequelize = require('sequelize');
-const { SELECT } = require('sequelize/types/query-types');
-
 class User extends Sequelize.Model {
     static initiate(sequelize){
         User.init({

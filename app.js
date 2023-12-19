@@ -5,14 +5,21 @@ const path = require('path'); //node 내장 모듈
 const session = require('express-session'); //session
 const nunjucks = require('nunjucks'); //front frameworks
 const dotenv = require('dotenv'); //설정파일
+const passport = require('passport');
 const { sequelize } = require('./models');
 
 dotenv.config(); //process.env에 값이 들어간다.
 const pageRouter = require('./routes/page');
+const authRouter = require('./routes/auth');
+
+const passportConfig = require('./passport');
+
 const { watch } = require('fs');
 const { error } = require('console');
 
 const app = express();
+passportConfig();
+
 app.set('port', process.env.PORT || 8001);
 app.set('view engine', 'html');
 nunjucks.configure('views', {
@@ -42,8 +49,11 @@ app.use(session( {
         secure : false, // ssl 적용시 true
     }
 }))
+app.use(passport.initialize()); // 꼭 express.session 미들웨어 밑에 작성해야한다. , req.user, req.login, req.isAuthenticated, req.logout 함수 사용 가능
+app.use(passport.session()); // connect.sid라는 이름으로 세션 쿠키가 브라우저로 전송
 
 app.use('/', pageRouter);
+app.use('/auth', authRouter);
 app.use((req,res,next) =>{ //404 NOT FOUND
     const error = new Error(`${req.url} ${req.method} 화면을 찾을 수 없습니다.`);
     error.status = 404;
