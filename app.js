@@ -11,6 +11,7 @@ const { sequelize } = require('./models');
 dotenv.config(); //process.env에 값이 들어간다.
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
+const postRouter = require('./routes/post');
 
 const passportConfig = require('./passport');
 
@@ -37,6 +38,7 @@ sequelize.sync( {force: false} ) //force = 서버 재시작 시 테이블 전체
 
 app.use(morgan('dev')); // logging dev = dev -> combined = prod
 app.use(express.static(path.join(__dirname, 'public'))); //public dir static으로 변경, __dirname = SNS 경로와 public 경로를 join하고 static으로 변경
+app.use('/img', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json()); // json요청 받게
 app.use(express.urlencoded({extended:false})); //form 요청 받게
 app.use(cookieParser(process.env.COOKIE_SECRET)); //{connect.sid : 랜덤쿠키값} 객체로 만들어줌
@@ -54,6 +56,8 @@ app.use(passport.session()); // connect.sid라는 이름으로 세션 쿠키가 
 
 app.use('/', pageRouter);
 app.use('/auth', authRouter);
+app.use('/post', postRouter);
+
 app.use((req,res,next) =>{ //404 NOT FOUND
     const error = new Error(`${req.url} ${req.method} 화면을 찾을 수 없습니다.`);
     error.status = 404;
