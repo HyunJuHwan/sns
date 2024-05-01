@@ -7,27 +7,27 @@ const config = require('../config/config')[env];
 const db = {};
 const sequelize = new Sequelize(
   config.database, config.username, config.password, config,
-)
+);
 
 db.sequelize = sequelize;
 
-const basename = path.basename(__filename); // path의 마지막 파일명, 여기서는 index.js
-
+const basename = path.basename(__filename);
 fs
-  .readdirSync(__dirname) // 현재 파일의 폴더명 = __dirname
-  .filter(file =>{
+  .readdirSync(__dirname) // 현재 폴더의 모든 파일을 조회
+  .filter(file => { // 숨김 파일, index.js, js 확장자가 아닌 파일 필터링
     return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
   })
-  .forEach((file) =>{
+  .forEach(file => { // 해당 파일의 모델 불러와서 init
     const model = require(path.join(__dirname, file));
+    console.log(file, model.name);
     db[model.name] = model;
     model.initiate(sequelize);
   });
 
-  Object.keys(db).forEach(modelName => { //initiate먼저 전체 실행 후 associate를 실행해야 한다.
-    if(db[modelName].associate){
-      db[modelName].associate(db);
-    }
-  })
+Object.keys(db).forEach(modelName => { // associate 호출
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
 module.exports = db;
