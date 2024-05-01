@@ -1,28 +1,24 @@
 const express = require('express');
 const passport = require('passport');
-
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 const { join, login, logout } = require('../controllers/auth');
-
 const router = express.Router();
 
-// POST /auth/join
-router.post('/join', isNotLoggedIn, join); 
-
-// POST /auth/login
+//Post /auth/join
+router.post('/join', isNotLoggedIn, join);
+//Post /auth/login
 router.post('/login', isNotLoggedIn, login);
-
-// GET /auth/logout
+//Get /auth/logout
 router.get('/logout', isLoggedIn, logout);
 
-// GET /auth/kakao
-router.get('/kakao', passport.authenticate('kakao'));
+//Get /auth/kakao
+router.get('/kakao', passport.authenticate('kakao')); //카카오톡 로그인 화면으로 redirect -> 로그인 성공 후 callback으로 결과를 보내준다.
 
-// GET /auth/kakao/callback
+//Get /auth/kakao/callback
 router.get('/kakao/callback', passport.authenticate('kakao', {
-  failureRedirect: '/?error=카카오로그인 실패',
-}), (req, res) => {
-  res.redirect('/'); // 성공 시에는 /로 이동
+    failureRedirect: '/?loginError=카카오로그인 실패'
+}), (req,res) => {
+    res.redirect('/');
 });
 
 module.exports = router;
